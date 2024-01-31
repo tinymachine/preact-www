@@ -1,6 +1,9 @@
 import { checkStatus } from './request';
 
-const baseUrl = '/.netlify/functions/';
+const baseUrl =
+	process.env.NODE_ENV === 'production'
+		? '/.netlify/functions/'
+		: 'http://localhost:9000/.netlify/functions/';
 
 export const repoInfo = repo =>
 	fetch(`${baseUrl}repo?repo=${repo}`, { credentials: 'omit' })
