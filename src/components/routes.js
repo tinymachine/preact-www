@@ -26,6 +26,7 @@ export default function Routes() {
 	return (
 		<main>
 			<progress-bar showing={loading} />
+<<<<<<< Updated upstream
 			<Router
 				onLoadStart={() => setLoading(true)}
 				onLoadEnd={() => setLoading(false)}
@@ -51,6 +52,23 @@ export default function Routes() {
 				<Route path="/blog/:slug" component={BlogPage} />
 				<Route default component={NotFound} />
 			</Router>
+=======
+			<ErrorBoundary>
+				<Router
+					onLoadStart={() => setLoading(true)}
+					onLoadEnd={() => setLoading(false)}
+				>
+					{Object.keys(navRoutes)
+						.filter(route => !route.startsWith('/guide'))
+						.map(route => {
+							const component = route === '/repl' ? Repl : Page;
+							return <Route key={route} path={route} component={component} />;
+						})}
+					<Route path="/guide/:version/:name" component={DocPage} />
+					<Route default component={NotFound} />
+				</Router>
+			</ErrorBoundary>
+>>>>>>> Stashed changes
 		</main>
 	);
 }

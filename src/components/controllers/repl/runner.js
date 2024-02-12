@@ -1,9 +1,17 @@
+<<<<<<< Updated upstream
 import { Component, createRef } from 'preact';
 import { memoize } from 'decko';
 import style from './style.module.css';
 import * as Comlink from 'comlink';
+=======
+import { h, Component, render, hydrate } from 'preact';
+import * as preact from 'preact';
+import { debounce, memoOne } from './utils';
+>>>>>>> Stashed changes
 import { patchErrorLocation } from './errors';
+import { wrap } from 'comlink';
 
+<<<<<<< Updated upstream
 let cachedFetcher = memoize(fetch);
 let cachedFetch = (...args) => cachedFetcher(...args).then(r => r.clone());
 
@@ -22,8 +30,20 @@ function createRoot(doc) {
 	doc.body.appendChild(root);
 }
 
+=======
+export const ReplWorker = wrap(
+	new Worker(new URL('./repl.worker.js', import.meta.url), {
+		type: 'module'
+	})
+);
+
+let cachedFetcher = memoOne(fetch);
+let cachedFetch = (...args) => cachedFetcher(...args).then(r => r.clone());
+
+>>>>>>> Stashed changes
 export default class Runner extends Component {
-	static worker = worker;
+	// FIXME: Wait for WMR 3.7.2
+	// static worker = worker;
 
 	frame = createRef();
 
@@ -88,6 +108,7 @@ export default class Runner extends Component {
 		}, 500);
 	}
 
+<<<<<<< Updated upstream
 	async rebuild() {
 		await new Promise((resolve, reject) => {
 			let frame = this.frame.current;
@@ -149,6 +170,30 @@ export default class Runner extends Component {
 					this.root = render(null, base);
 				} catch (e) {
 					console.error('Failed to unmount previous code: ', e);
+=======
+		ReplWorker.process(code, {})
+			.then(transpiled => this.execute(transpiled))
+			.then(onSuccess)
+			.catch(error => {
+				patchErrorLocation(error);
+				if (onError) onError({ error });
+			});
+	});
+
+	execute(transpiled, isFallback) {
+		const PREACT = {
+			...preact,
+			render: (v, a, b) => {
+				if (!vnode) vnode = v;
+				else if (this.base.contains(a)) {
+					return render(v, a, b);
+				}
+			},
+			hydrate: (v, a) => {
+				if (!vnode) vnode = v;
+				else if (this.base.contains(a)) {
+					return hydrate(v, a);
+>>>>>>> Stashed changes
 				}
 			}
 			base.innerHTML = '';
@@ -167,7 +212,43 @@ export default class Runner extends Component {
 			}
 		};
 
+<<<<<<< Updated upstream
 		let fn = await this.realm.eval(transpiled);
+=======
+		let module = { exports: {} },
+			modules = {
+				preact: () => PREACT,
+				'preact/hooks': () => import('preact/hooks'),
+				'preact/debug': () => import('preact/debug'),
+				'preact/compat': () => import('preact/compat'),
+				react: () => import('preact/compat'),
+				'react-dom': () => import('preact/compat'),
+				htm: () => import('htm'),
+				'preact-custom-element': () => import('preact-custom-element')
+			},
+			moduleCache = {},
+			fn,
+			vnode;
+
+		function _require(id) {
+			// flatten unpkg
+			if (typeof id === 'string') {
+				id = id.replace(/(^(https?:)?\/\/unpkg\.com\/|\?module$)/gi, '');
+			}
+			if (id in moduleCache) {
+				return moduleCache[id];
+			}
+			if (id in modules) {
+				return (moduleCache[id] = modules[id]());
+			}
+			throw Error(`No module found for ${id}`);
+		}
+
+		if (isFallback === true) {
+			this.root = render(null, this.base);
+			this.base.innerHTML = '';
+		}
+>>>>>>> Stashed changes
 
 		try {
 			fn(module, module.exports);

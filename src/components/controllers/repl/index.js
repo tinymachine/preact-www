@@ -4,6 +4,7 @@ import { debounce } from 'decko';
 import { ErrorOverlay } from './error-overlay';
 import { localStorageGet, localStorageSet } from '../../../lib/localstorage';
 import { parseStackTrace } from './errors';
+<<<<<<< Updated upstream
 import style from './style.module.css';
 import { useTitle } from '../utils';
 import REPL_CSS from './examples.css?raw';
@@ -16,6 +17,10 @@ import repoListExample from './examples/github-repo-list.txt?file';
 import contextExample from './examples/context.txt?file';
 import spiralExample from './examples/spiral.txt?file';
 import { Splitter } from '../../splitter';
+=======
+import { debounce } from './utils';
+import { ReplWorker } from './runner';
+>>>>>>> Stashed changes
 
 const EXAMPLES = [
 	{
@@ -121,7 +126,7 @@ export default class Repl extends Component {
 
 			// Load transpiler
 			this.setState({ loading: 'Initializing REPL...' });
-			this.Runner.worker.ping().then(() => {
+			ReplWorker.ping().then(() => {
 				this.setState({ loading: false });
 				let example = this.state.exampleSlug;
 				if (this.props.code) {

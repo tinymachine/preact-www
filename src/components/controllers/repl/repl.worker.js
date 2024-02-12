@@ -1,11 +1,18 @@
+<<<<<<< Updated upstream
 import '@babel/polyfill';
 import { rollup } from '@rollup/browser';
 import { transform } from 'sucrase';
 import * as Comlink from 'comlink';
+=======
+>>>>>>> Stashed changes
 import { parseStackTrace } from './errors';
+import { transform, parse } from 'escorn';
+import { expose } from 'comlink';
+import babelHtm from 'babel-plugin-transform-jsx-to-htm';
 
 const PREPEND = `(function(module,exports){`;
 
+<<<<<<< Updated upstream
 // These are used by the Tutorial to inject solution detection.
 const IMPORTS = `import * as $preact from 'preact';
 import * as $hooks from 'preact/hooks';
@@ -34,6 +41,31 @@ function transpile(code) {
 			jsxPragma: 'h',
 			jsxFragmentPragma: 'Fragment'
 		});
+=======
+const IMPORTS = `
+import {render,hydrate,h,createElement,Fragment,createRef,Component,cloneElement,createContext,toChildArray,options} from 'preact';
+import {useState,useReducer,useEffect,useLayoutEffect,useRef,useImperativeHandle,useMemo,useCallback,useContext,useDebugValue} from 'preact/hooks';\n
+`;
+
+function process(code) {
+	code = `${IMPORTS}${code}`;
+
+	if (!code.match(/[\s\b;,]export[{ ]/)) {
+		code = code.replace(
+			/([\s\b;,])((async )?(function|class)[\s{])/g,
+			'$1export default $2'
+		);
+	}
+
+	let out = {};
+	try {
+		// FIXME: Sucrase imports a bunch of react-specific stuff which breaks
+		const result = transform(code, {
+			parse,
+			plugins: [babelHtm]
+		});
+		out.code = result.code;
+>>>>>>> Stashed changes
 	} catch (err) {
 		if (err.name !== 'SyntaxError' && /unexpected\stoken/i.test(err.message)) {
 			let old = err;
@@ -170,4 +202,13 @@ export async function process(code, setup) {
 	return transpiled;
 }
 
+<<<<<<< Updated upstream
 Comlink.expose({ ping, process });
+=======
+expose({
+	ping() {
+		return true;
+	},
+	process
+});
+>>>>>>> Stashed changes

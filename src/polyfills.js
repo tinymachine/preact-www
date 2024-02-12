@@ -1,6 +1,9 @@
+<<<<<<< Updated upstream
 // Adds fetch and Promise polyfills
 require('preact-cli/src/lib/webpack/polyfills');
 
+=======
+>>>>>>> Stashed changes
 if (typeof window !== 'undefined') {
 	if (!Element.prototype.matches) {
 		Element.prototype.matches =
